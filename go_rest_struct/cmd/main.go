@@ -8,13 +8,16 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/hamkorbank/go_rest_struct/config"
-	v1 "gitlab.com/hamkorbank/go_rest_struct/handlers/v1"
+	v1 "gitlab.com/hamkorbank/go_rest_struct/handler/v1"
+	"gitlab.com/hamkorbank/go_rest_struct/pkg/logger"
 )
 
 func main() {
-	r := gin.Default()
+	server := gin.Default()
 
 	cfg := config.Load()
+
+	log := logger.New(cfg.LogLevel, "project_name")
 
 	psqlConnString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		cfg.PostgresHost,
@@ -22,21 +25,17 @@ func main() {
 		cfg.PostgresUser,
 		cfg.PostgresPassword,
 		cfg.PostgresDatabase)
-
 	db, err := sqlx.Connect("postgres", psqlConnString)
-
 	if err != nil {
-		fmt.Println(err)
-		// log.Error("postgres connect error",
-		// 	logger.Error(err))
+		log.Error("postgres connect error", logger.Error(err))
 		return
 	}
 
-	handlerV1 := v1.New(cfg, db)
+	handlerV1 := v1.New(cfg, log, db)
 
-	r.GET("/ping", handlerV1.Ping)
-	r.GET("/config", handlerV1.GetConfig)
-	r.GET("/applications/:id", handlerV1.GetApplication)
+	server.GET("/ping", handlerV1.Ping)
+	server.GET("/config", handlerV1.GetConfig)
+	server.GET("/applications/:id", handlerV1.GetApplication)
 
-	r.Run(cfg.HTTPPort)
+	server.Run(cfg.HTTPPort)
 }

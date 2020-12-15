@@ -1,4 +1,4 @@
-package models
+package model
 
 // Application ...
 type Application struct {

@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cast"
 )
 
-// Config ...
+// Config represents a system configuration
 type Config struct {
 	Environment string // development, staging, release
 
@@ -22,7 +22,7 @@ type Config struct {
 	PostgresPassword string
 }
 
-// Load ...
+// Load returns the system config
 func Load() Config {
 	if err := godotenv.Load(); err != nil {
 		log.Print("No .env file found")
@@ -43,6 +43,7 @@ func Load() Config {
 	return config
 }
 
+// getOrReturnDefaultValue first looks up from env varibale or return dafaultValue
 func getOrReturnDefaultValue(key string, defaultValue interface{}) interface{} {
 	_, exists := os.LookupEnv(key)
 

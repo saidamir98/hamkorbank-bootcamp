@@ -52,13 +52,15 @@ func (h *Handler) GetApplication(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		h.log.Error("error while parsing id param to int", logger.Error(err), logger.Any("id", c.Param("id")))
-		c.JSON(http.StatusUnprocessableEntity, err)
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		return
 	}
 
 	resp, err := h.storagePostgres.Application().Get(id)
 	if err != nil {
 		h.log.Error("error while getting application data by id from storage", logger.Error(err), logger.Any("id", id))
-		c.JSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	c.JSON(http.StatusOK, resp)

@@ -26,6 +26,7 @@ func main() {
 		cfg.PostgresPassword,
 		cfg.PostgresDatabase)
 	db, err := sqlx.Connect("postgres", psqlConnString)
+	defer db.Close()
 	if err != nil {
 		log.Error("postgres connect error", logger.Error(err))
 		return
